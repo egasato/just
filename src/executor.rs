@@ -100,24 +100,32 @@ impl Executor<'_> {
       .take_while(|line| line.is_shebang())
       .count();
 
+    let mut newline = "\n";
+    if let Self::Shebang(shebang) = self {
+      match shebang.interpreter_filename().to_lowercase().as_str() {
+        "cmd" | "cmd.exe" => newline = "\r\n",
+        _ => {}
+      }
+    }
+
     if let Self::Shebang(shebang) = self {
       for shebang_line in &lines[..shebangs] {
         if shebang.include_shebang_line() {
           script.push_str(shebang_line);
         }
-        script.push('\n');
+        script.push_str(newline);
         n += 1;
       }
     }
 
     for (line, text) in recipe.body.iter().zip(lines).skip(n) {
       while n < line.number {
-        script.push('\n');
+        script.push_str(newline);
         n += 1;
       }
 
       script.push_str(text);
-      script.push('\n');
+      script.push_str(newline);
       n += 1;
     }
 
