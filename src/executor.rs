@@ -55,7 +55,7 @@ impl Executor<'_> {
       };
 
       match interpreter {
-        "cmd" | "cmd.exe" => ".bat",
+        "cmd" | "cmd.exe" => ".cmd",
         "powershell" | "powershell.exe" | "pwsh" | "pwsh.exe" => ".ps1",
         _ => "",
       }
