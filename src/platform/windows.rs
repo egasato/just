@@ -10,7 +10,8 @@ impl PlatformInterface for Platform {
     use std::borrow::Cow;
 
     // If the path contains forward slashes…
-    let command = if shebang.interpreter.contains('/') {
+    let unix_shebang = shebang.interpreter.contains('/');
+    let command = if unix_shebang {
       // …translate path to the interpreter from unix style to windows style.
       let mut cygpath = Command::new(&config.cygpath);
 
@@ -38,7 +39,11 @@ impl PlatformInterface for Platform {
     }
 
     if let Some(argument) = shebang.argument {
-      cmd.arg(argument);
+      if unix_shebang {
+        cmd.arg(argument);
+      } else {
+        cmd.args(argument.split(' '));
+      }
     }
 
     cmd.arg(path);
